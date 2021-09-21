@@ -162,8 +162,9 @@ Submit this .csv file into Canvas as well
 
 ### Bonus: (10 points)
 
-1) Examine the output called air_v3. Why it still contains NAs? (5 points)
-Answer: Yes it contains NA since...
+1) Examine the output called air_v3. Does it still contain NAs? (5 points)
+
+Answer:
 
 2) Try to use `drop_na` function to exclude all the NAs in air_v3. Name the output air_v4. Export air_v4 as a csv and turn it in compass (5 points).    
 
