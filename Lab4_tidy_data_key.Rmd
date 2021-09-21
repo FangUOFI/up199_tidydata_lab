@@ -1,0 +1,172 @@
+---
+title: "Lab 4 Tidy data (50 points)"
+author: "Fang Fang"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Delivery:
+
+1.Answer 8 questions in a word document. 
+
+2.You should also submit a .csv file. 
+
+3.You have 10 bonus points at the end of this lab. 
+
+### To start: 
+
+1. Create a new subfolder called "output" under lab4. 
+2. Create a new project under lab4. 
+3. Go to File---New file---R script. Name it as Lab4_.r. Save this script under Lab4 folder. 
+4. Download the dataset from COMPASS called "air_raw_upload.csv" and save it under the "data" subfolder.  
+ 
+
+Dataset information:
+
+We will clean up the data downloaded from NSW Planning Industry & Environment website (https://www.dpie.nsw.gov.au/air-quality/search-for-and-download-air-quality-data). The meteorological variables was measured hourly in three stations: 1) WALLSEND; 2) NEWCASTLE; 3) BERESFIELD. 
+The measured 5 types of meteorological variables are: 1) Wind speed; 2) Wind direction; 3) Air temperature; 4) Relative humidity; 5) Global solar radiation. 
+
+Ideally, the tidy dataset should look like:
+
+![ ](images/answer.jpg) 
+
+## Steps:
+
+### 1. Import the dataset.
+Execute the code below to load the dataset. Ignore the warning messages.    
+```{r eval=FALSE}
+library(tidyverse)
+air<- read_csv("data/air_raw_upload.csv")
+```
+Examine the dataset called Air_quality_raw and answer the quesions below. 
+
+### Question 1: (5 points)
+How many rows and columns does this dataset have?
+
+Answer:  1440 rows and 17 columns
+
+### Question 2: (5 points)
+Is this dataset tidy or messy? Why?
+
+Answer: Messy. The station and variables are mixed up, and the column names are not a certain attribute, they are certain values. 
+
+                
+
+### Hint: 
+Let me provide you some initial thoughts here. The first few steps: `pivot_longer` (make your table longer. Organize multiple columns into one pair of columns) --separate (split the column contains multiple values).  
+
+### 2. Turn wide table into a long one. Name the output as air_v1. 
+First of all, you need to use `pivot_longer` to stack columns 3-17 together into two new columns. 
+
+
+1. For the first new column: name it "mix"  to store the column names such as "WALLSEND WDR". 
+2. For second new column: name it "measured_value" to store the corresponding value in that cell. 
+3. Note you should exclude NAs.
+4. You do not need to stack these columns: Date, Time. 
+
+Please complete your code in R and answer the questions.
+
+### Question 3:(5 points)
+How many rows and columns does air_v1 have? 
+```{r eval=FALSE}
+air_v1 <- pivot_longer(air,cols=(-c("Date","Time")),
+        names_to="mix",values_to="measured_value")
+```
+
+
+### 3. Separate the column called mix.
+Note under air_v1, there is a column called mix. This column merges two types of information: 1) station name; 2) meteorological variable. These two parts are separated by space. 
+
+Let's use `separate` function to split these strings into two new columns. 
+
+
+1. Note you should set `sep` properly.
+3. The old column to be separated is called "mix". 
+4. For the two new columns, name them: "Station" and  "Meteorological variable". 
+
+Complete the code in your script window. Assign the new data as air_v2.
+
+
+
+We are almost there.
+
+
+
+### Question 4:(5 points)
+Examine air_v2. Why is this dataset a messy data? 
+```{r eval=F}
+air_v2 <- separate(air_v1, sep=" ",mix, c("Station","Meteorological variable"))
+```
+Answer: Yes it is still messy. The meteorological variables should have their own columns. 
+
+### Question 5: (10 points)
+Based on your answer above, select one of the following functins `separate`, `unite`, `pivot_longer` to make air_v2 clean. Name the output as air_v3. 
+```{r eval=F}
+air_v3 <- pivot_wider(air_v2,names_from="Meteorological variable",  
+    values_from="measured_value")
+```
+
+### Question 6: (5 points)
+After you execute the function you choose above, How many rows and columns do you have for this clean dataset (air_v3)? 
+Answer: 4320 rows and 8 columns. 
+
+
+
+
+
+### Question 7:(10 points)
+
+Among the three stations, which one has the highest average temperature? 
+
+Hint: Once your dataset is clean, let's use tapply to calculate the average by 3 stations. You need to exclude the NAs. 
+
+Note you need to provide both your `tapply` code and answers for question 7. 
+```{r eval=F}
+tapply(air_v3$TEMP,air_v3$Station,mean, na.rm=T)
+```
+Answer: BERESFIELD: 24.22
+
+### 4. Export and submit your assignment. 
+
+Let's export this air_v3 as a .csv file on your local device. 
+ Name your file as yourname_lab4.csv.
+
+If the error message says
+
+![ ](images/error.jpg) 
+
+Make sure you have a subfolder called "output". Then execute the code below.
+
+
+```{r eval=FALSE}
+write_csv(air_v3,"output/Fang_lab4.csv")
+```
+
+
+
+### Question 8:(5 points)
+Submit this .csv file into COMPASS. 
+
+
+
+# This is the end of Lab 4. 
+
+### Bonus: (10 points)
+
+1) Examine the output called air_v3. Why it still contains NAs? (5 points)
+Answer: Yes it contains NAs.
+
+2) Try to use `drop_na` function to exclude all the NAs in air_v3. Name the output air_v4. Export air_v4 as a csv and turn it in compass (5 points).    
+
+Hint: you can use `?drop_na` to know more about this function. 
+
+```{r eval=F}
+air_v4 <- drop_na(air_v3)
+write_csv(air_v4,"output/air_v4.csv")
+```
+Answer: the drop_na function will exclude entire row if any NA appears
